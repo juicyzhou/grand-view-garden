@@ -236,7 +236,10 @@ export class Garden {
       hallOpts: { w: 7.5, d: 5.5, name: '有凤来仪', platformH: 0.5 },
       hallPos: [36.5, -1], hallRot: -Math.PI / 2,
     });
-    // 竹林环合
+    // 月洞门上匾额
+    const xiaoxiangBoard = signboard('潇湘馆', M, 1.7);
+    this.place(xiaoxiangBoard, 25, 2, -Math.PI / 2, { y: 3.05, collide: false });
+    // 竹林环合（门路与迎门视线留白）
     const bambooSpots = [];
     for (let i = 0; i < 220; i++) {
       const a = Math.random() * Math.PI * 2;
@@ -244,11 +247,12 @@ export class Garden {
       const x = 34 + Math.cos(a) * rr * 1.25;
       const z = 2 + Math.sin(a) * rr * 0.95;
       if (x > 26 && x < 43 && z > -4 && z < 8) continue; // 院内留白
+      if (x > 21 && x < 28.5 && z > -2 && z < 6) continue; // 月洞门迎宾通道
       if (Math.abs(x) > 59 || Math.abs(z) > 43) continue;
       bambooSpots.push({ x, z });
     }
-    for (let i = 0; i < 40; i++) { // 院内疏竹
-      bambooSpots.push({ x: 27 + Math.random() * 3, z: -3.5 + Math.random() * 11 });
+    for (let i = 0; i < 24; i++) { // 院内疏竹退至东南隅，让出月门至厅堂的花径
+      bambooSpots.push({ x: 27 + Math.random() * 2.5, z: 3.8 + Math.random() * 3.8 });
     }
     const grove = bambooGrove(bambooSpots, M);
     this.scene.add(grove);
@@ -294,7 +298,7 @@ export class Garden {
     this.place(rockCluster(M, { count: 3, spread: 2.4, maxW: 2, maxH: 2.4 }), -38, -28);
     this.scene.add(flowerBed(-29, -19, 3, 50, M.foliage, M, { y: this.getGroundHeight(-29, -19), noColor: true }));
     this.place(pine(M, { scale: 1.15 }), -42, -26);
-    this.npcSpots.push({ id: 'baochan', x: -33, z: -17.5, face: Math.PI });
+    this.npcSpots.push({ id: 'baochai', x: -33, z: -17.5, face: Math.PI });
 
     // ---------- 栊翠庵（西北隅） ----------
     this.buildCourtyard({
@@ -362,6 +366,7 @@ export class Garden {
 
     // ---------- 甬路 ----------
     this.buildPaths();
+    this.buildGuideLamps();
 
     // ---------- 灯笼 ----------
     const lanternSpots = [
@@ -588,6 +593,8 @@ export class Garden {
       [[-30, -12], [-20, -30]],
       // 大观楼前东西路
       [[-14, -14], [14, -14]],
+      // 潇湘馆内：月洞门 → 有凤来仪厅前的卵石花径
+      [[25.5, 2], [30, 0.8], [32.8, -0.6]],
     ];
     const slabs = [];
     for (const line of polylines) {
@@ -619,6 +626,66 @@ export class Garden {
     this.scene.add(inst);
   }
 
+  // ---------- 引路莲花灯：沿主线的发光花灯，引导新客前行 ----------
+  buildGuideLamps() {
+    const M = this.mats;
+    // 主轴南段、主轴北段、横街东路、潇湘馆甬路
+    const lines = [
+      { x1: 0, z1: 44, x2: 0, z2: 26, step: 6, side: 1.8 },
+      { x1: 0, z1: 1, x2: 0, z2: -15, step: 5.5, side: 1.8 },
+      { x1: 4, z1: 30, x2: 22, z2: 30, step: 6, side: -1.8 },
+      { x1: 26, z1: 26, x2: 26, z2: 8, step: 6, side: -1.6 },
+    ];
+    const stemMat = M.woodDark;
+    this.guideLampMats = [];
+    const petalGeo = new THREE.ConeGeometry(0.07, 0.16, 6);
+    const heartGeo = new THREE.SphereGeometry(0.055, 8, 6);
+    const stemGeo = new THREE.CylinderGeometry(0.022, 0.03, 0.62, 6);
+    const baseGeo = new THREE.CylinderGeometry(0.09, 0.12, 0.1, 8);
+
+    let idx = 0;
+    for (const ln of lines) {
+      const len = Math.hypot(ln.x2 - ln.x1, ln.z2 - ln.z1);
+      const n = Math.max(1, Math.floor(len / ln.step));
+      for (let i = 0; i <= n; i++) {
+        const t = n === 0 ? 0 : i / n;
+        const x = ln.x1 + (ln.x2 - ln.x1) * t + (idx % 2 ? ln.side : -ln.side);
+        const z = ln.z1 + (ln.z2 - ln.z1) * t;
+        const g = new THREE.Group();
+
+        const petalMat = new THREE.MeshLambertMaterial({
+          color: 0xe8a0b0, emissive: 0xff88a0, emissiveIntensity: 0.3,
+        });
+        const heartMat = new THREE.MeshLambertMaterial({
+          color: 0xf2d08a, emissive: 0xffc860, emissiveIntensity: 0.3,
+        });
+        this.guideLampMats.push(petalMat, heartMat);
+
+        const base = new THREE.Mesh(baseGeo, M.stone);
+        base.position.y = 0.05;
+        const stem = new THREE.Mesh(stemGeo, stemMat);
+        stem.position.y = 0.4;
+        g.add(base, stem);
+        // 莲瓣六出
+        for (let p = 0; p < 6; p++) {
+          const a = (p / 6) * Math.PI * 2;
+          const petal = new THREE.Mesh(petalGeo, petalMat);
+          petal.position.set(Math.cos(a) * 0.075, 0.74, Math.sin(a) * 0.075);
+          petal.rotation.set(Math.sin(a) * 0.7, 0, -Math.cos(a) * 0.7);
+          g.add(petal);
+        }
+        const heart = new THREE.Mesh(heartGeo, heartMat);
+        heart.position.y = 0.76;
+        g.add(heart);
+
+        g.position.set(x, 0, z);
+        g.userData.phase = idx * 0.7;
+        this.scene.add(g);
+        idx += 1;
+      }
+    }
+  }
+
   // 当前所在区域
   zoneAt(x, z) {
     for (const zn of this.zones) {
@@ -627,12 +694,19 @@ export class Garden {
     return null;
   }
 
-  update(t) {
+  update(t, nightFactor = 0) {
     for (const m of this.waterMats) {
       if (m.userData.shader) m.userData.shader.uniforms.uTime.value = t;
     }
     for (const m of this.swayMats) {
       if (m.userData.shader) m.userData.shader.uniforms.uTime.value = t;
+    }
+    // 引路花灯：昼间微光，入夜大明，次第明灭如呼吸
+    if (this.guideLampMats) {
+      this.guideLampMats.forEach((m, i) => {
+        const breathe = 0.5 + 0.5 * Math.sin(t * 1.8 + i * 0.9);
+        m.emissiveIntensity = 0.22 + nightFactor * 1.35 + breathe * 0.18;
+      });
     }
   }
 }

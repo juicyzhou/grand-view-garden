@@ -51,6 +51,28 @@ await page.screenshot({ path: 'scripts/dialogue.png' });
 await page.keyboard.press('KeyE'); // 推进对话
 await new Promise((r) => setTimeout(r, 300));
 
+// 任务断言：与黛玉交谈后「潇湘访黛」应已印，追踪器更新
+const quest = await page.evaluate(() => ({
+  daiyuDone: window.__game.quest.isDone('daiyu'),
+  doneCount: window.__game.quest.doneCount,
+  tracker: document.getElementById('tracker-hint').textContent,
+  trackerVisible: !!document.getElementById('quest-tracker'),
+}));
+if (!quest.daiyuDone) errors.push('QUEST: daiyu chapter not completed after talk');
+if (quest.doneCount < 2) errors.push(`QUEST: doneCount ${quest.doneCount} < 2 (enter+daiyu)`);
+
+// 游记册开合
+await page.keyboard.press('KeyJ');
+await new Promise((r) => setTimeout(r, 400));
+const journal = await page.evaluate(() => ({
+  visible: !document.getElementById('quest-journal').classList.contains('hidden'),
+  doneRows: document.querySelectorAll('.journal-row.done').length,
+}));
+if (!journal.visible) errors.push('JOURNAL: not visible after J');
+await page.screenshot({ path: 'scripts/journal.png' });
+await page.keyboard.press('KeyJ');
+await new Promise((r) => setTimeout(r, 300));
+
 // 诗碑
 await page.evaluate(() => {
   const g = window.__game;
@@ -67,6 +89,6 @@ const poem = await page.evaluate(() => ({
 }));
 await page.screenshot({ path: 'scripts/poem.png' });
 
-console.log(JSON.stringify({ hint, dlg, poem, errors }, null, 2));
+console.log(JSON.stringify({ hint, dlg, quest, journal, poem, errors }, null, 2));
 await browser.close();
 process.exit(errors.length ? 1 : 0);

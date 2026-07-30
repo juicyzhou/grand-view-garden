@@ -102,10 +102,20 @@ html, body {
 }
 .title-hint { margin-top: 4vh; color: rgba(242, 234, 216, 0.42); font-size: 13px; letter-spacing: 2px; }
 .title-footer { color: rgba(201, 165, 92, 0.4); font-size: 12px; letter-spacing: 6px; }
+#version-tag {
+  position: absolute; right: 18px; bottom: 14px;
+  color: rgba(242, 234, 216, 0.35);
+  font-size: 12px; letter-spacing: 2px;
+}
 .touch-hint { display: none; }
 @media (pointer: coarse) {
   .desktop-hint { display: none; }
   .touch-hint { display: inline; }
+
+  #quest-tracker { top: auto; bottom: calc(150px + env(safe-area-inset-bottom)); left: 12px; padding: 8px 12px; max-width: 62vw; }
+  #tracker-progress { font-size: 11px; }
+  #tracker-hint { font-size: 12px; }
+  #tutorial-hint { font-size: 14px; padding: 10px 18px; letter-spacing: 2px; bottom: 26vh; max-width: 86vw; white-space: normal; text-align: center; }
 }
 
 /* ---------- HUD ---------- */
@@ -191,6 +201,109 @@ html, body {
 .help-row b { color: var(--ink); letter-spacing: 1px; }
 .help-row span { color: var(--ink-soft); }
 .help-tip { margin-top: 12px; font-size: 12px; line-height: 1.9; color: var(--ink-soft); }
+
+/* ---------- 任务与引导 ---------- */
+#quest-tracker {
+  position: absolute; top: 18px; left: 18px;
+  background: rgba(23, 20, 16, 0.55);
+  border: 1px solid rgba(201, 165, 92, 0.35);
+  border-radius: 3px;
+  padding: 10px 16px;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: border-color 0.25s;
+  max-width: 260px;
+}
+#quest-tracker:hover { border-color: var(--gold); }
+#tracker-progress {
+  color: var(--gold); font-size: 13px; letter-spacing: 3px; margin-bottom: 4px;
+}
+#tracker-hint {
+  color: var(--paper); font-size: 13px; letter-spacing: 1.5px; line-height: 1.6;
+}
+#tracker-hint::before { content: "◈ "; color: var(--gold); }
+
+#tutorial-hint {
+  position: absolute; left: 50%; bottom: 14vh; transform: translateX(-50%);
+  background: rgba(23, 20, 16, 0.72);
+  border: 1px solid rgba(201, 165, 92, 0.5);
+  color: var(--paper);
+  padding: 12px 28px;
+  font-size: 16px; letter-spacing: 3px;
+  border-radius: 2px;
+  animation: hintFloat 2.2s ease-in-out infinite;
+  white-space: nowrap;
+}
+#tutorial-hint b { color: var(--gold); margin: 0 4px; }
+
+#quest-journal {
+  position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  z-index: 17;
+  width: min(430px, 92vw);
+  background: var(--paper-dim);
+  border: 1px solid rgba(43, 38, 32, 0.35);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+  padding: 26px 30px 16px;
+}
+.journal-title { text-align: center; color: var(--cinnabar); font-size: 20px; letter-spacing: 10px; font-weight: 700; }
+.journal-sub { text-align: center; color: var(--ink-soft); font-size: 12px; letter-spacing: 3px; margin: 8px 0 18px; }
+#journal-list { display: flex; flex-direction: column; gap: 7px; }
+.journal-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 7px 10px;
+  border-bottom: 1px dashed rgba(43, 38, 32, 0.15);
+}
+.journal-stamp {
+  width: 34px; height: 34px; flex: none;
+  border: 1.5px solid rgba(43, 38, 32, 0.3);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; color: rgba(43, 38, 32, 0.35);
+  transform: rotate(-4deg);
+}
+.journal-row.done .journal-stamp {
+  background: var(--cinnabar);
+  border-color: var(--cinnabar);
+  color: var(--paper);
+  box-shadow: 0 0 10px rgba(166, 58, 44, 0.35);
+}
+.journal-name { flex: 1; font-size: 15px; letter-spacing: 2px; color: var(--ink); }
+.journal-row:not(.done) .journal-name { color: rgba(43, 38, 32, 0.4); }
+.journal-state { font-size: 12px; color: var(--ink-soft); letter-spacing: 1px; }
+.journal-foot {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 16px; padding-top: 12px;
+}
+#journal-reset {
+  font-family: var(--serif);
+  background: transparent;
+  border: 1px solid rgba(43, 38, 32, 0.3);
+  color: var(--ink-soft);
+  font-size: 12px; letter-spacing: 3px;
+  padding: 6px 14px; cursor: pointer;
+}
+#journal-reset:hover { border-color: var(--cinnabar); color: var(--cinnabar); }
+.journal-close-hint { font-size: 11px; color: rgba(43, 38, 32, 0.4); letter-spacing: 2px; }
+
+#celebration {
+  position: fixed; inset: 0; z-index: 25;
+  background: rgba(23, 20, 16, 0.82);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3vh; cursor: pointer;
+  animation: fadeIn 0.8s ease;
+}
+.celebration-seal {
+  width: 110px; height: 110px;
+  background: var(--cinnabar); color: var(--paper);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 44px; font-weight: 700; letter-spacing: 6px; text-indent: 6px;
+  border-radius: 8px;
+  box-shadow: 0 0 60px rgba(166, 58, 44, 0.7);
+  animation: sealPulse 1.8s ease-in-out infinite;
+}
+.celebration-title { color: var(--paper); font-size: clamp(22px, 4vw, 34px); letter-spacing: 10px; text-indent: 10px; }
+.celebration-poem { color: rgba(201, 165, 92, 0.85); font-size: clamp(14px, 2vw, 18px); letter-spacing: 5px; }
+.celebration-hint { color: rgba(242, 234, 216, 0.4); font-size: 12px; letter-spacing: 3px; margin-top: 2vh; }
 
 /* ---------- 对话 ---------- */
 #dialogue {

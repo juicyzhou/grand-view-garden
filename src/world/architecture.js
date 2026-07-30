@@ -447,11 +447,14 @@ export function moonGate(mats, { w = 3.8, h = 2.9, holeR = 1.12 } = {}) {
   const body = new THREE.Mesh(geo, mats.wall);
   g.add(body);
 
-  const rim = new THREE.Mesh(new THREE.TorusGeometry(holeR, 0.06, 8, 32), mats.woodDark);
-  rim.position.set(0, h * 0.48, 0.16);
-  const rim2 = rim.clone();
-  rim2.position.z = -0.16;
-  g.add(rim, rim2);
+  // 砖雕包边（石色宽缘 + 内圈细线）
+  for (const zoff of [0.16, -0.16]) {
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(holeR, 0.09, 8, 32), mats.stoneDark);
+    rim.position.set(0, h * 0.48, zoff);
+    const trim = new THREE.Mesh(new THREE.TorusGeometry(holeR + 0.13, 0.03, 6, 32), mats.stone);
+    trim.position.set(0, h * 0.48, zoff);
+    g.add(rim, trim);
+  }
 
   const cap = new THREE.Mesh(
     hipRoofGeometry({ w, d: 0.6, h: 0.3, overhang: 0.3, ridgeRatio: 0.9, upturn: 0.08, rings: 4 }),

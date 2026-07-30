@@ -1,11 +1,14 @@
+import { version } from '../package.json';
 import { Engine } from './core/engine.js';
 import { Player } from './core/player.js';
 import { AudioManager } from './core/audio.js';
 import { Garden } from './world/garden.js';
 import { NPCManager } from './world/npc.js';
 import { HUD } from './ui/hud.js';
+import { QuestManager } from './ui/quest.js';
 
 const canvas = document.getElementById('scene');
+document.getElementById('version-tag').textContent = `v${version}`;
 
 const engine = new Engine(canvas);
 const garden = new Garden(engine.scene);
@@ -23,10 +26,11 @@ const player = new Player(engine.camera, garden, canvas);
 player.pos.y = garden.getGroundHeight(player.pos.x, player.pos.z);
 
 const audio = new AudioManager();
-const hud = new HUD({ garden, npcMgr, audio, engine, player, canvas });
+const quest = new QuestManager();
+const hud = new HUD({ garden, npcMgr, audio, engine, player, canvas, quest });
 
 // 调试/自动化测试句柄
-window.__game = { engine, garden, player, npcMgr, audio, hud };
+window.__game = { engine, garden, player, npcMgr, audio, hud, quest };
 
 // 场景阴影设置
 engine.scene.traverse((o) => {
@@ -51,7 +55,7 @@ function animate() {
 
   player.update(dt);
   npcMgr.update(dt, player.pos, t);
-  garden.update(t);
+  garden.update(t, engine.nightFactor);
   engine.update(dt, player.pos, t);
   audio.setNight(engine.nightFactor);
   hud.update(dt);

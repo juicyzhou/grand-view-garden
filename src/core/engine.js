@@ -46,6 +46,7 @@ export class Engine {
     this.cycleDuration = 360; // 秒/全天
     this.nightFactor = 0;
     this.lanternMats = [];
+    this.celebrationT = 0; // 集章圆满：灯笼齐明计时
 
     window.addEventListener('resize', () => this.onResize());
   }
@@ -168,6 +169,10 @@ export class Engine {
     return this.cycleMode;
   }
 
+  celebrate(seconds = 24) {
+    this.celebrationT = seconds;
+  }
+
   update(dt, playerPos, elapsed) {
     if (this.cycleMode === 'auto') {
       this.cycleT = (this.cycleT + dt / this.cycleDuration) % 1;
@@ -232,10 +237,13 @@ export class Engine {
       c.material.opacity = 0.5 * day;
     }
 
-    // 灯笼
+    // 灯笼（圆满庆祝时白昼亦明）
+    this.celebrationT = Math.max(0, this.celebrationT - dt);
+    const cele = Math.min(1, this.celebrationT / 3);
+    const lanternGlow = Math.max(this.nightFactor, cele);
     this.lanternMats.forEach((m, i) => {
       const flicker = 0.9 + 0.18 * Math.sin(elapsed * 6 + i * 1.7) * Math.sin(elapsed * 3.3 + i);
-      m.emissiveIntensity = this.nightFactor * 1.5 * flicker + 0.03;
+      m.emissiveIntensity = lanternGlow * (1.5 + cele * 0.8) * flicker + 0.03;
     });
 
     // 天穹跟随玩家

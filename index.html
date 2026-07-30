@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>大观园 · 入画</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23a63a2c'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' fill='%23f2ead8' font-family='serif'%3E观%3C/text%3E%3C/svg%3E" />
     <link rel="stylesheet" href="./src/style.css" />
   </head>
   <body>
@@ -30,6 +31,7 @@
         </div>
       </div>
       <div class="title-footer">— 幻 境 所 至 · 皆 成 文 章 —</div>
+      <div id="version-tag"></div>
     </div>
 
     <!-- HUD -->
@@ -38,9 +40,30 @@
       <div id="crosshair"></div>
       <div id="interact-hint" class="hidden"></div>
       <div id="top-bar">
+        <button id="btn-quest" class="hud-btn" title="游记（J）">游记</button>
         <button id="btn-cycle" class="hud-btn" title="切换昼夜">昼夜</button>
         <button id="btn-audio" class="hud-btn" title="音乐开关">音</button>
         <button id="btn-help" class="hud-btn" title="操作帮助">?</button>
+      </div>
+      <div id="quest-tracker" title="点击查看游记">
+        <div id="tracker-progress">游记 · 零/玖</div>
+        <div id="tracker-hint"></div>
+      </div>
+      <div id="tutorial-hint" class="hidden"></div>
+      <div id="quest-journal" class="hidden">
+        <div class="journal-title">大 观 园 游 记</div>
+        <div class="journal-sub">集齐九章，方悟游园惊梦</div>
+        <div id="journal-list"></div>
+        <div class="journal-foot">
+          <button id="journal-reset">重 置 游 记</button>
+          <span class="journal-close-hint">按 J 或点击空白合上</span>
+        </div>
+      </div>
+      <div id="celebration" class="hidden">
+        <div class="celebration-seal">圆满</div>
+        <div class="celebration-title">游园惊梦 · 九章集齐</div>
+        <div class="celebration-poem">假作真时真亦假，无为有处有还无</div>
+        <div class="celebration-hint">点击任意处继续</div>
       </div>
       <div id="help-panel" class="hidden">
         <div class="help-title">游 园 指 南</div>

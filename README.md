@@ -5,6 +5,10 @@
 
 ![大观园](scripts/aerial.png)
 
+## 版本
+
+当前版本见 [CHANGELOG.md](CHANGELOG.md)（语义化版本：小修改迭代修订号，功能迭代小版本，重大修改大版本）。
+
 ## 快速开始
 
 ```bash
