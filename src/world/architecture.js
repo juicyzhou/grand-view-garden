@@ -122,11 +122,14 @@ function goldFinial(h, mats) {
 
 export function platform(w, d, h, mats) {
   const g = new THREE.Group();
-  const base = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mats.stone);
-  base.position.y = h / 2;
-  const lip = new THREE.Mesh(new THREE.BoxGeometry(w + 0.24, 0.1, d + 0.24), mats.stoneDark);
-  lip.position.y = h - 0.05;
-  g.add(base, lip);
+  // 分层构造，杜绝共面：基座顶 h-0.05 → 地面板 h → 裙边顶 h-0.055（错开防 z-fighting 闪烁）
+  const base = new THREE.Mesh(new THREE.BoxGeometry(w, h - 0.05, d), mats.stone);
+  base.position.y = (h - 0.05) / 2;
+  const top = new THREE.Mesh(new THREE.BoxGeometry(w, 0.05, d), mats.platformTop || mats.stone);
+  top.position.y = h - 0.025;
+  const lip = new THREE.Mesh(new THREE.BoxGeometry(w + 0.24, 0.09, d + 0.24), mats.stoneDark);
+  lip.position.y = h - 0.1;
+  g.add(base, top, lip);
   g.userData.ground = [{ minX: -w / 2, maxX: w / 2, minZ: -d / 2, maxZ: d / 2, y: h }];
   return g;
 }

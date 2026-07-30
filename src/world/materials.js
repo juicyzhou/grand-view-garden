@@ -134,29 +134,57 @@ export function dirtTexture() {
   return tex;
 }
 
-// 匾额文字纹理
-export function plaqueTexture(text, { bg = '#26201a', fg = '#d8b96a', vertical = false } = {}) {
-  const key = `plaque:${text}:${bg}:${fg}:${vertical}`;
-  return canvasTexture(key, 256, (ctx, s) => {
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, s, s);
-    ctx.strokeStyle = fg;
-    ctx.lineWidth = 8;
-    ctx.strokeRect(8, 8, s - 16, s - 16);
-    ctx.fillStyle = fg;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = `bold ${vertical ? 56 : 64}px "Songti SC", "STSong", serif`;
-    if (vertical) {
-      const chars = [...text];
-      const step = (s - 60) / chars.length;
-      chars.forEach((ch, i) => ctx.fillText(ch, s / 2, 34 + step * (i + 0.5)));
-    } else {
-      const chars = [...text];
-      const step = (s - 60) / chars.length;
-      chars.forEach((ch, i) => ctx.fillText(ch, 34 + step * (i + 0.5), s / 2));
+// 台明地面纹理：金砖墁地（方砖拼缝压暗，消正午眩光）
+export function platformTopTexture() {
+  return canvasTexture('platformTop', 256, (ctx, s) => {
+    noiseOn(ctx, s, '#a29a88', 40, 0.3);
+    ctx.strokeStyle = 'rgba(60, 54, 44, 0.38)';
+    ctx.lineWidth = 3;
+    const cell = s / 4;
+    for (let i = 0; i <= 4; i++) {
+      ctx.beginPath(); ctx.moveTo(i * cell, 0); ctx.lineTo(i * cell, s); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, i * cell); ctx.lineTo(s, i * cell); ctx.stroke();
     }
   });
+}
+
+// 匾额纹理：与牌面同宽高比（横 3.12:1 / 竖 1:3.12），汉字保持方正不拉伸
+export function plaqueTexture(text, { bg = '#26201a', fg = '#d8b96a', vertical = false } = {}) {
+  const key = `plaque:${text}:${bg}:${fg}:${vertical}:v2`;
+  if (textureCache.has(key)) return textureCache.get(key);
+  const canvas = document.createElement('canvas');
+  canvas.width = vertical ? 164 : 512;
+  canvas.height = vertical ? 512 : 164;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, w, h);
+  ctx.strokeStyle = fg;
+  ctx.lineWidth = 7;
+  ctx.strokeRect(9, 9, w - 18, h - 18);
+
+  const chars = [...text];
+  ctx.fillStyle = fg;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  if (vertical) {
+    const fs = Math.min(104, (h - 70) / chars.length);
+    ctx.font = `bold ${fs}px "Songti SC", "STSong", serif`;
+    const step = (h - 70) / chars.length;
+    chars.forEach((ch, i) => ctx.fillText(ch, w / 2, 35 + step * (i + 0.5)));
+  } else {
+    const fs = Math.min(100, (w - 90) / chars.length);
+    ctx.font = `bold ${fs}px "Songti SC", "STSong", serif`;
+    const step = (w - 90) / chars.length;
+    chars.forEach((ch, i) => ctx.fillText(ch, 45 + step * (i + 0.5), h / 2 + 2));
+  }
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  textureCache.set(key, tex);
+  return tex;
 }
 
 // 诗碑文字纹理
@@ -207,6 +235,7 @@ export function makeMaterials() {
     woodDark: flat(PALETTE.woodDark),
     stone: flat(PALETTE.stone),
     stoneDark: flat(PALETTE.stoneDark),
+    platformTop: new THREE.MeshLambertMaterial({ map: platformTopTexture() }),
     path: flat(PALETTE.path),
     rock: new THREE.MeshLambertMaterial({ color: PALETTE.rock, flatShading: true }),
     rockDark: new THREE.MeshLambertMaterial({ color: PALETTE.rockDark, flatShading: true }),
