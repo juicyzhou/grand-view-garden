@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>大观园 · 入画</title>
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+    <div id="vignette"></div>
+
+    <!-- 加载 -->
+    <div id="loading">
+      <div class="loading-seal">观</div>
+      <div class="loading-text">正在营建园囿…</div>
+    </div>
+
+    <!-- 入画标题屏 -->
+    <div id="title-screen" class="hidden">
+      <div class="title-ink"></div>
+      <div class="title-content">
+        <div class="title-sub">红 楼 一 梦 · 沉 浸 游 园</div>
+        <h1 class="title-main">大观园</h1>
+        <div class="title-poem">绕堤柳借三篙翠 · 隔岸花分一脉香</div>
+        <button id="enter-btn">入　画</button>
+        <div class="title-hint">
+          <span class="desktop-hint">WASD 行走 · Shift 疾行 · 空格 跳跃 · E 交谈 · 鼠标环视</span>
+          <span class="touch-hint">左侧摇杆行走 · 右侧滑动环视 · 点击按钮交谈</span>
+        </div>
+      </div>
+      <div class="title-footer">— 幻 境 所 至 · 皆 成 文 章 —</div>
+    </div>
+
+    <!-- HUD -->
+    <div id="hud" class="hidden">
+      <div id="location-banner"><span id="location-name"></span></div>
+      <div id="crosshair"></div>
+      <div id="interact-hint" class="hidden"></div>
+      <div id="top-bar">
+        <button id="btn-cycle" class="hud-btn" title="切换昼夜">昼夜</button>
+        <button id="btn-audio" class="hud-btn" title="音乐开关">音</button>
+        <button id="btn-help" class="hud-btn" title="操作帮助">?</button>
+      </div>
+      <div id="help-panel" class="hidden">
+        <div class="help-title">游 园 指 南</div>
+        <div class="help-row"><b>W A S D</b><span>行走</span></div>
+        <div class="help-row"><b>Shift</b><span>疾行</span></div>
+        <div class="help-row"><b>空格</b><span>跳跃</span></div>
+        <div class="help-row"><b>E</b><span>与人物交谈 / 品读诗碑</span></div>
+        <div class="help-row"><b>鼠标</b><span>环视四周</span></div>
+        <div class="help-row"><b>Esc</b><span>释放鼠标</span></div>
+        <div class="help-tip">园中可访：潇湘馆 · 怡红院 · 蘅芜苑 · 稻香村 · 栊翠庵 · 沁芳亭 · 藕香榭 · 大观楼</div>
+      </div>
+    </div>
+
+    <!-- 对话 -->
+    <div id="dialogue" class="hidden">
+      <div id="dlg-name"></div>
+      <div id="dlg-text"></div>
+      <div id="dlg-next">按 E 或点击继续 ▸</div>
+    </div>
+
+    <!-- 诗碑 -->
+    <div id="poem-panel" class="hidden">
+      <div id="poem-title"></div>
+      <div id="poem-body"></div>
+      <div class="poem-close">按 E 或点击合上</div>
+    </div>
+
+    <!-- 触屏控件 -->
+    <div id="touch-ui" class="hidden">
+      <div id="joystick"><div id="joystick-knob"></div></div>
+      <button id="touch-interact">交谈</button>
+      <button id="touch-jump">跃</button>
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
