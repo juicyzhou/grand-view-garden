@@ -61,6 +61,15 @@ export class HUD {
 
     this.$('dialogue').addEventListener('click', () => this.advanceDialogue());
     this.$('poem-panel').addEventListener('click', () => this.closePanels());
+    // 移动端：显式触摸事件，确保点按文本框即可推进/合上
+    this.$('dialogue').addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      this.advanceDialogue();
+    }, { passive: false });
+    this.$('poem-panel').addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      this.closePanels();
+    }, { passive: false });
 
     this.$('btn-cycle').addEventListener('click', () => {
       const mode = this.engine.toggleCycle();
@@ -121,6 +130,7 @@ export class HUD {
     this.player.enabled = false;
     this.$('dialogue').classList.remove('hidden');
     this.$('dlg-name').textContent = npc.cfg.name;
+    this.$('dlg-next').textContent = this.player.isTouchDevice ? '点击文本继续 ▸' : '按 E 或点击继续 ▸';
     this.showLine();
     this.syncResumeOverlay();
   }
@@ -211,7 +221,7 @@ export class HUD {
       this.interactTarget = best;
       const hint = this.$('interact-hint');
       if (best) {
-        hint.innerHTML = `<b>E</b>${best.label}`;
+        hint.innerHTML = this.player.isTouchDevice ? best.label : `<b>E</b>${best.label}`;
         hint.classList.remove('hidden');
         if (this.player.isTouchDevice) {
           const btn = this.$('touch-interact');

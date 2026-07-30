@@ -179,10 +179,11 @@ export class Player {
     const running = this.keys.has('ShiftLeft') || this.keys.has('ShiftRight');
     const speed = running ? 7.2 : 4.2;
 
-    // 朝向旋转
+    // 朝向旋转：view = (-sin yaw, 0, -cos yaw)，right = (cos yaw, 0, -sin yaw)
+    // W 时 iz=-1，应沿 view 方向移动
     const sin = Math.sin(this.yaw), cos = Math.cos(this.yaw);
-    const wishX = (ix * cos - iz * sin) * speed;
-    const wishZ = (ix * sin + iz * cos) * speed * -1;
+    const wishX = (ix * cos + iz * sin) * speed;
+    const wishZ = (iz * cos - ix * sin) * speed;
 
     // 平滑加減速
     const accel = this.grounded ? 14 : 4;

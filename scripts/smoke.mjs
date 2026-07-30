@@ -36,10 +36,14 @@ await page.screenshot({ path: 'scripts/shot-title.png' });
 await page.click('#enter-btn');
 await new Promise((r) => setTimeout(r, 1200));
 
-// 模拟行走 + 环视
+// 模拟行走 + 环视（W 应向北，即 z 减小）
+const zBefore = await page.evaluate(() => window.__game.player.pos.z);
 await page.keyboard.down('KeyW');
-await new Promise((r) => setTimeout(r, 2500));
+await new Promise((r) => setTimeout(r, 2000));
 await page.keyboard.up('KeyW');
+const zAfter = await page.evaluate(() => window.__game.player.pos.z);
+const walkForward = zAfter < zBefore - 1;
+if (!walkForward) errors.push(`WALK DIRECTION WRONG: z ${zBefore} -> ${zAfter}`);
 await page.screenshot({ path: 'scripts/shot-ingame.png' });
 
 // 检查 HUD 状态
