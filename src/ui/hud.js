@@ -144,7 +144,10 @@ export class HUD {
   start() {
     this.started = true;
     this.audio.start();
-    this.$('title-screen').classList.add('hidden');
+    // 内联 display 兜底：残留旧缓存 CSS 可能不认 .hidden，导致标题遮罩盖在游戏上不消失
+    const title = this.$('title-screen');
+    title.classList.add('hidden');
+    title.style.display = 'none';
     this.$('hud').classList.remove('hidden');
     if (this.player.isTouchDevice) {
       this.$('touch-ui').classList.remove('hidden');

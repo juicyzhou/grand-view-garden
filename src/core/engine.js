@@ -6,9 +6,10 @@ import * as THREE from 'three';
  */
 export class Engine {
   constructor(canvas) {
+    this.canvas = canvas;
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setSize(window.innerWidth, window.innerHeight, false);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -48,7 +49,28 @@ export class Engine {
     this.lanternMats = [];
     this.celebrationT = 0; // 集章圆满：灯笼齐明计时
 
-    window.addEventListener('resize', () => this.onResize());
+    window.addEventListener('resize', () => this.fitToScreen());
+    // 移动浏览器：旋转、地址栏收放、微信 webview 入场过渡均可能绕过 resize
+    window.addEventListener('orientationchange', () => {
+      this.fitToScreen();
+      setTimeout(() => this.fitToScreen(), 350);
+    });
+    window.visualViewport?.addEventListener('resize', () => this.fitToScreen());
+    // 入场后兜底两次重适配（微信滑入动画结束时视口才稳定）
+    setTimeout(() => this.fitToScreen(), 300);
+    setTimeout(() => this.fitToScreen(), 1200);
+  }
+
+  // 画布显示尺寸交给 CSS（100dvw/dvh），这里只同步绘图缓冲与相机比例
+  fitToScreen() {
+    const w = this.canvas.clientWidth || window.innerWidth;
+    const h = this.canvas.clientHeight || window.innerHeight;
+    const size = new THREE.Vector2();
+    this.renderer.getSize(size);
+    if (Math.round(size.x) === w && Math.round(size.y) === h && this.camera.aspect === w / h) return;
+    this.renderer.setSize(w, h, false);
+    this.camera.aspect = w / h;
+    this.camera.updateProjectionMatrix();
   }
 
   buildSky() {
@@ -157,9 +179,7 @@ export class Engine {
   }
 
   onResize() {
-    this.camera.aspect = window.innerWidth / window.innerHeight;
-    this.camera.updateProjectionMatrix();
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.fitToScreen();
   }
 
   toggleCycle() {

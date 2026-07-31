@@ -10,6 +10,25 @@
 
 ---
 
+## [1.1.2] - 2026-07-31
+
+### 修复
+- **手机端画布两侧黑边**：`renderer.setSize` 写入的内联像素样式覆盖 CSS，微信等移动 webview 入场过渡/地址栏收放改变视口而不触发 resize，画布被冻结在旧宽度。改为：画布显示尺寸交由 CSS `100dvw/100dvh`，`setSize(updateStyle=false)` 仅同步绘图缓冲；补充 `orientationchange`/`visualViewport` 监听、入场 300ms/1200ms 两次兜底重适配，以及主循环每 0.5s 的自愈校验
+
+---
+
+## [1.1.2] - 2026-07-31
+
+### 修复
+- **手机端标题遮罩罩住游戏画面**：同域旧部署残留的 Service Worker/CacheStorage 会长期劫持 index.html，旧样式与新脚本混搭导致点「入画」后标题遮罩（灰色半透明层）无法隐藏、整屏覆盖游戏；启动时一律注销遗留 Service Worker 并清空 CacheStorage
+- 标题屏隐藏改用内联 `display:none` 兜底，优先级高于一切残留样式表
+- 补充 `-webkit-backdrop-filter` 前缀（旧版 iOS Safari）；版本角标空值守卫；引导提示与任务追踪间距加大
+
+### 工程
+- 仓库提交者统一为 juicyzhou
+
+---
+
 ## [1.1.1] - 2026-07-31
 
 ### 修复

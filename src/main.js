@@ -7,8 +7,22 @@ import { NPCManager } from './world/npc.js';
 import { HUD } from './ui/hud.js';
 import { QuestManager } from './ui/quest.js';
 
+// 旧部署可能遗留 Service Worker / CacheStorage，劫持 index.html 造成新旧混合的错乱页面；
+// 启动时一律注销并清空，强制后续访问走网络最新版本
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations()
+    .then((regs) => regs.forEach((r) => r.unregister()))
+    .catch(() => {});
+}
+if ('caches' in window) {
+  caches.keys()
+    .then((keys) => keys.forEach((k) => caches.delete(k)))
+    .catch(() => {});
+}
+
 const canvas = document.getElementById('scene');
-document.getElementById('version-tag').textContent = `v${version}`;
+const versionTag = document.getElementById('version-tag');
+if (versionTag) versionTag.textContent = `v${version}`;
 
 const engine = new Engine(canvas);
 const garden = new Garden(engine.scene);
@@ -44,6 +58,7 @@ engine.scene.traverse((o) => {
 let prevMs = performance.now();
 let elapsed = 0;
 let firstFrame = true;
+let fitCheckT = 0;
 
 function animate() {
   requestAnimationFrame(animate);
@@ -52,6 +67,13 @@ function animate() {
   prevMs = now;
   elapsed += dt;
   const t = elapsed;
+
+  // 兜底自愈：周期性校验画布与视口是否失配（移动 webview 可能漏发 resize）
+  fitCheckT += dt;
+  if (fitCheckT > 0.5) {
+    fitCheckT = 0;
+    engine.fitToScreen();
+  }
 
   player.update(dt);
   npcMgr.update(dt, player.pos, t);
