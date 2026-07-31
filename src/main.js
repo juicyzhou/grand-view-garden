@@ -46,6 +46,9 @@ const hud = new HUD({ garden, npcMgr, audio, engine, player, canvas, quest });
 // 调试/自动化测试句柄
 window.__game = { engine, garden, player, npcMgr, audio, hud, quest };
 
+import { maybeEnableDebug } from './debug.js';
+maybeEnableDebug({ engine, version });
+
 // 场景阴影设置
 engine.scene.traverse((o) => {
   if (o.isMesh) {
