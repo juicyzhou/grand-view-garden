@@ -119,9 +119,6 @@ html, body {
   .desktop-hint { display: none; }
   .touch-hint { display: inline; }
 
-  #quest-tracker { top: auto; bottom: calc(150px + env(safe-area-inset-bottom)); left: 12px; padding: 8px 12px; max-width: 62vw; }
-  #tracker-progress { font-size: 11px; }
-  #tracker-hint { font-size: 12px; }
   #tutorial-hint { font-size: 14px; padding: 10px 18px; letter-spacing: 2px; bottom: 32vh; max-width: 86vw; white-space: normal; text-align: center; }
 }
 
@@ -384,3 +381,17 @@ html, body {
 #touch-interact { bottom: 112px; }
 #touch-jump { bottom: 30px; background: rgba(78, 122, 58, 0.5); }
 #touch-interact.hidden { display: none !important; }
+
+/* ---------- 触屏端游记追踪器 ----------
+   必须放在桌面版 #quest-tracker 规则之后：此前 @media 块写在桌面规则之前，
+   同优先级下桌面 top:18px 覆盖了移动端 top:auto，而 bottom 仍生效，
+   top+bottom 同时存在导致块被拉伸至近全屏高、下方大片空白 */
+@media (pointer: coarse) {
+  #quest-tracker {
+    top: auto; bottom: calc(150px + env(safe-area-inset-bottom));
+    left: 12px; height: fit-content;
+    padding: 8px 12px; max-width: 62vw;
+  }
+  #tracker-progress { font-size: 11px; }
+  #tracker-hint { font-size: 12px; }
+}
