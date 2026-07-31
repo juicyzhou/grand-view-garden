@@ -10,16 +10,19 @@
 
 ---
 
-## [1.1.2] - 2026-07-31
+## [1.1.3] - 2026-07-31
 
 ### 修复
-- **手机端画布两侧黑边**：`renderer.setSize` 写入的内联像素样式覆盖 CSS，微信等移动 webview 入场过渡/地址栏收放改变视口而不触发 resize，画布被冻结在旧宽度。改为：画布显示尺寸交由 CSS `100dvw/100dvh`，`setSize(updateStyle=false)` 仅同步绘图缓冲；补充 `orientationchange`/`visualViewport` 监听、入场 300ms/1200ms 两次兜底重适配，以及主循环每 0.5s 的自愈校验
+- **旧 Service Worker 死锁致部分手机持续显示旧版页面**：旧 SW 拦截导航并以旧缓存应答，新页面与新 JS 永远加载不到，main.js 内的清理代码无从执行；随部署发布自毁型 `sw.js`——浏览器定期独立检查 SW 更新时取到它，即清空 CacheStorage、注销自身并强制刷新所有已打开页面，无需用户操作即可解脱旧缓存劫持
 
 ---
 
 ## [1.1.2] - 2026-07-31
 
 ### 修复
+- **手机端画布两侧黑边**：`renderer.setSize` 写入的内联像素样式覆盖 CSS，微信等移动 webview 入场过渡/地址栏收放改变视口而不触发 resize，画布被冻结在旧宽度。改为：画布显示尺寸交由 CSS `100dvw/100dvh`，`setSize(updateStyle=false)` 仅同步绘图缓冲；补充 `orientationchange`/`visualViewport` 监听、入场 300ms/1200ms 两次兜底重适配，以及主循环每 0.5s 的自愈校验
+
+### 修复（同日第二轮）
 - **手机端标题遮罩罩住游戏画面**：同域旧部署残留的 Service Worker/CacheStorage 会长期劫持 index.html，旧样式与新脚本混搭导致点「入画」后标题遮罩（灰色半透明层）无法隐藏、整屏覆盖游戏；启动时一律注销遗留 Service Worker 并清空 CacheStorage
 - 标题屏隐藏改用内联 `display:none` 兜底，优先级高于一切残留样式表
 - 补充 `-webkit-backdrop-filter` 前缀（旧版 iOS Safari）；版本角标空值守卫；引导提示与任务追踪间距加大
